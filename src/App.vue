@@ -4,7 +4,6 @@
 		<LockScreen v-if="themeConfig.isLockScreen" />
 		<Setings ref="setingsRef" v-show="setLockScreen" />
 		<CloseFull v-if="!themeConfig.isLockScreen" />
-		<Upgrade v-if="getVersion" />
 	</el-config-provider>
 </template>
 
@@ -24,7 +23,6 @@ import setIntroduction from '/@/utils/setIconfont';
 const LockScreen = defineAsyncComponent(() => import('/@/layout/lockScreen/index.vue'));
 const Setings = defineAsyncComponent(() => import('/@/layout/navBars/topBar/setings.vue'));
 const CloseFull = defineAsyncComponent(() => import('/@/layout/navBars/topBar/closeFull.vue'));
-const Upgrade = defineAsyncComponent(() => import('/@/layout/upgrade/index.vue'));
 // 定义变量内容
 const { messages, locale } = useI18n();
 const setingsRef = ref();
@@ -38,15 +36,6 @@ const setLockScreen = computed(() => {
 	// 防止锁屏后，刷新出现不相关界面
 	// https://gitee.com/lyt-top/vue-next-admin/issues/I6AF8P
 	return themeConfig.value.isLockScreen ? themeConfig.value.lockScreenTime > 1 : themeConfig.value.lockScreenTime >= 0;
-});
-// 获取版本号
-const getVersion = computed(() => {
-	let isVersion = false;
-	if (route.path !== '/login') {
-		// @ts-ignore
-		if ((Local.get('version') && Local.get('version') !== __NEXT_VERSION__) || !Local.get('version')) isVersion = true;
-	}
-	return isVersion;
 });
 // 获取全局组件大小
 const getGlobalComponentSize = computed(() => {
