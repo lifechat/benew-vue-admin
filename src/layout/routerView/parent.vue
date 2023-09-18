@@ -78,9 +78,6 @@ onBeforeMount(() => {
 // 页面加载时
 onMounted(() => {
 	getIframeListRoutes();
-	// https://gitee.com/lyt-top/vue-next-admin/issues/I58U75
-	// https://gitee.com/lyt-top/vue-next-admin/issues/I59RXK
-	// https://gitee.com/lyt-top/vue-next-admin/pulls/40
 	nextTick(() => {
 		setTimeout(() => {
 			if (themeConfig.value.isCacheTagsView) {
@@ -95,7 +92,7 @@ onUnmounted(() => {
 	mittBus.off('onTagsViewRefreshRouterView', () => {});
 });
 // 监听路由变化，防止 tagsView 多标签时，切换动画消失
-// https://toscode.gitee.com/lyt-top/vue-next-admin/pulls/38/files
+// https://toscode.gitee.com/lifechat/benew-vue-admin/pulls/38/files
 watch(
 	() => route.fullPath,
 	() => {

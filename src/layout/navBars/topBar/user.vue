@@ -182,7 +182,7 @@ const onHandleCommandClick = (path: string) => {
 			})
 			.catch(() => {});
 	} else if (path === 'wareHouse') {
-		window.open('https://gitee.com/lyt-top/vue-next-admin');
+		window.open('https://github.com/lifechat/benew-vue-admin');
 	} else {
 		router.push(path);
 	}

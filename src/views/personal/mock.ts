@@ -6,17 +6,17 @@ export const newsInfoList = [
 	{
 		title: '[发布] 2021年02月28日发布基于 vue3.x + vite v1.0.0 版本',
 		date: '02/28',
-		link: 'https://gitee.com/lyt-top/vue-next-admin',
+		link: 'https://gitee.com/lifechat/benew-vue-admin',
 	},
 	{
 		title: '[发布] 2021年04月15日发布 vue2.x + webpack 重构版本',
 		date: '04/15',
-		link: 'https://gitee.com/lyt-top/vue-next-admin/tree/vue-prev-admin/',
+		link: 'https://gitee.com/lifechat/benew-vue-admin/tree/vue-prev-admin/',
 	},
 	{
 		title: '[重构] 2021年04月10日 重构 vue2.x + webpack v1.0.0 版本',
 		date: '04/10',
-		link: 'https://gitee.com/lyt-top/vue-next-admin/tree/vue-prev-admin/',
+		link: 'https://gitee.com/lifechat/benew-vue-admin/tree/vue-prev-admin/',
 	},
 	{
 		title: '[预览] 2020年12月08日，基于 vue3.x 版本后台模板的预览',

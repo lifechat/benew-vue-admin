@@ -12,7 +12,7 @@
 		<a href="https://vitejs.dev/" target="_blank">
 		  <img src="https://img.shields.io/badge/vite-%3E2.0.0-yellow" alt="vite">
 		</a>
-		<a href="https://gitee.com/lyt-top/vue-next-admin/blob/master/LICENSE" target="_blank">
+		<a href="https://gitee.com/lifechat/benew-vue-admin/blob/master/LICENSE" target="_blank">
 		  <img src="https://img.shields.io/badge/license-MIT-success" alt="license">
 		</a>
 	</p>
@@ -25,10 +25,10 @@
 
 #### ⛱️ 线上预览
 
-
 #### 💒 代码仓库
 
 ##### 提交规范
+
 <ul>
     <ul>
       <li>feat 增加新功能</li>
@@ -47,7 +47,7 @@
       <li>types 类型修改</li>
     </ul>
 </ul>
-<!-- - vue3.x 版本 <a href="https://gitee.com/lyt-top/vue-next-admin" target="_blank">https://gitee.com/lyt-top/vue-next-admin</a> -->
+<!-- - vue3.x 版本 <a href="https://gitee.com/lifechat/benew-vue-admin" target="_blank">https://gitee.com/lifechat/benew-vue-admin</a> -->
 
 #### 🚧 安装 pnpm
 
@@ -83,8 +83,10 @@ pnpm run build
 ```
 
 #### 💯 学习交流加 QQ 群
-有疑问可以加Q:2596642641
+
+有疑问可以加 Q:2596642641
 一起交流学习
+
 #### 💒 集成后端
 
 #### 💌 支持作者

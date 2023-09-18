@@ -72,7 +72,7 @@ export function formatTwoStageRoutes(arr: any) {
 			newArr.push({ component: v.component, name: v.name, path: v.path, redirect: v.redirect, meta: v.meta, children: [] });
 		} else {
 			// 判断是否是动态路由（xx/:id/:name），用于 tagsView 等中使用
-			// 修复：https://gitee.com/lyt-top/vue-next-admin/issues/I3YX6G
+			// 修复：https://gitee.com/lifechat/benew-vue-admin/issues/I3YX6G
 			if (v.path.indexOf('/:') > -1) {
 				v.meta['isDynamic'] = true;
 				v.meta['isDynamicPath'] = v.path;
@@ -90,7 +90,10 @@ export function formatTwoStageRoutes(arr: any) {
 	return newArr;
 }
 
-// 路由加载前
+/***
+ * @author lifechat
+ * 前置路由守卫
+ **/ 
 router.beforeEach(async (to, from, next) => {
 	NProgress.configure({ showSpinner: false });
 	if (to.meta.title) NProgress.start();
@@ -117,7 +120,7 @@ router.beforeEach(async (to, from, next) => {
 					// to.query 防止页面刷新时，普通路由带参数时，参数丢失。动态路由（xxx/:id/:name"）isDynamic 无需处理
 					next({ path: to.path, query: to.query });
 				} else {
-					// https://gitee.com/lyt-top/vue-next-admin/issues/I5F1HP
+					// https://gitee.com/lifechat/benew-vue-admin/issues/I5F1HP
 					await initFrontEndControlRoutes();
 					next({ path: to.path, query: to.query });
 				}
@@ -128,10 +131,11 @@ router.beforeEach(async (to, from, next) => {
 	}
 });
 
-// 路由加载后
+/**
+ *  路由后置守卫
+ */
 router.afterEach(() => {
 	NProgress.done();
 });
 
-// 导出路由
 export default router;

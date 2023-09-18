@@ -39,12 +39,12 @@ export async function initBackEndControlRoutes() {
 	// 无 token 停止执行下一步
 	if (!Session.get('token')) return false;
 	// 触发初始化用户信息 pinia
-	// https://gitee.com/lyt-top/vue-next-admin/issues/I5F1HP
+	// https://gitee.com/lifechat/benew-vue-admin/issues/I5F1HP
 	await useUserInfo().setUserInfos();
 	// 获取路由菜单数据
 	const res = await getBackEndControlRoutes();
 	// 无登录权限时，添加判断
-	// https://gitee.com/lyt-top/vue-next-admin/issues/I64HVO
+	// https://gitee.com/lifechat/benew-vue-admin/issues/I64HVO
 	if (res.data.length <= 0) return Promise.resolve(true);
 	// 存储接口原始路由（未处理component），根据需求选择使用
 	useRequestOldRoutes().setRequestOldRoutes(JSON.parse(JSON.stringify(res.data)));
