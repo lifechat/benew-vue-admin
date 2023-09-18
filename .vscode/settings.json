@@ -1,0 +1,29 @@
+{
+	"eslint.enable": true, // 开启eslint校验语法
+	// 配置eslint作用文件类型
+	"eslint.validate": ["javascript", "typescript", "typescriptreact", "javascriptreact", "html", "vue"],
+	"editor.formatOnSave": true, // 是否开启自动保存格式化代码
+	"editor.defaultFormatter": "esbenp.prettier-vscode", // 默认的代码格式化工具
+	// 保存时根据eslint规则自动格式化
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true
+	},
+	"workbench.colorCustomizations": {
+		"activityBar.background": "#65c89b",
+		"activityBar.activeBackground": "#65c89b",
+		"activityBar.activeBorder": "#945bc4",
+		"activityBar.foreground": "#15202b",
+		"activityBar.inactiveForeground": "#15202b99",
+		"activityBarBadge.background": "#945bc4",
+		"activityBarBadge.foreground": "#e7e7e7",
+		"titleBar.activeBackground": "#42b883",
+		"titleBar.inactiveBackground": "#42b88399",
+		"titleBar.activeForeground": "#15202b",
+		"titleBar.inactiveForeground": "#15202b99",
+		"statusBar.background": "#42b883",
+		"statusBarItem.hoverBackground": "#359268",
+		"statusBar.foreground": "#15202b",
+		"statusBar.border": "#42b883",
+		"titleBar.border": "#42b883"
+	}
+}
