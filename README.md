@@ -28,6 +28,25 @@
 
 #### 💒 代码仓库
 
+##### 提交规范
+<ul>
+    <ul>
+      <li>feat 增加新功能</li>
+      <li>fix 修复问题/BUG</li>
+      <li>style 代码风格相关无影响运行结果的</li>
+      <li>perf 优化/性能提升</li>
+      <li>refactor 重构</li>
+      <li>revert 撤销修改</li>
+      <li>test 测试相关</li>
+      <li>docs 文档/注释</li>
+      <li>chore 依赖更新/脚手架配置修改等</li>
+      <li>workflow 工作流改进</li>
+      <li>ci 持续集成</li>
+      <li>mod 不确定分类的修改</li>
+      <li>wip 开发中</li>
+      <li>types 类型修改</li>
+    </ul>
+</ul>
 <!-- - vue3.x 版本 <a href="https://gitee.com/lyt-top/vue-next-admin" target="_blank">https://gitee.com/lyt-top/vue-next-admin</a> -->
 
 #### 🚧 安装 pnpm
