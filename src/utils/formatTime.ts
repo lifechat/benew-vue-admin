@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 /**
  * 时间日期转换
  * @param date 当前时间，new Date() 格式
@@ -134,4 +135,23 @@ export function formatAxis(param: Date): string {
 	else if (hour < 19) return '傍晚好';
 	else if (hour < 22) return '晚上好';
 	else return '夜里好';
+}
+
+/**
+ *  处理时间格式
+ */
+export function formatTime(date: string | Date | null, format = 'YYYY-MM-DD'): string {
+	if (date == null) {
+		return '';
+	}
+	return dayjs(date).format(format);
+}
+/**
+ *
+ * @param date
+ * @param format
+ * @description 将时间转换年-月-天 时-分-秒
+ */
+export function formatDateTime(date: string | Date, format = 'YYYY-MM-DD HH:mm:ss'): string {
+	return formatTime(date, format);
 }

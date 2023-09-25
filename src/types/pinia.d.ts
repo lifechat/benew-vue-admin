@@ -4,9 +4,33 @@
 
 // 用户信息
 declare interface UserInfos<T = any> {
+	/**
+	 * 用户id
+	 */
+	id: number | null;
+	/**
+	 * token
+	 */
+	token: string | undefined;
+
+	/**
+	 * 用户头像
+	 */
+	avatar: string;
+
+	/**
+	 * 角色
+	 */
+	roles: string[];
+
+	/**
+	 * 权限
+	 */
+	permissions: string[];
 	authBtnList: string[];
 	photo: string;
 	roles: string[];
+	permissions: string[];
 	time: number;
 	userName: string;
 	[key: string]: T;
@@ -89,4 +113,44 @@ declare interface ThemeConfigState {
 		globalI18n: string;
 		globalComponentSize: string;
 	};
+}
+
+/**
+ * 用户
+ */
+export interface UserState {
+	/**
+	 * 用户id
+	 */
+	id: number | null;
+	/**
+	 * token
+	 */
+	token: string | undefined;
+
+	/**
+	 * 用户头像
+	 */
+	avatar: string;
+
+	/**
+	 * 角色
+	 */
+	roles: string[];
+
+	/**
+	 * 权限
+	 */
+	permissions: string[];
+}
+
+/**
+ * 登录表单
+ */
+export interface LoginForm {
+	/** 用户名 */
+	username: string;
+
+	/** 密码 */
+	password: string;
 }

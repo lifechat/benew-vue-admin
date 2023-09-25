@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { ThemeConfigState } from '../types/pinia';
 
 /**
  * 布局配置
@@ -102,9 +103,9 @@ export const useThemeConfig = defineStore('themeConfig', {
 			// 是否开启色弱模式
 			isInvert: false,
 			// 是否开启水印
-			isWartermark: true,
+			isWartermark: false,
 			// 水印文案
-			wartermarkText: 'vue-next-admin',
+			wartermarkText: 'benew-vue-admin',
 
 			/**
 			 * 其它设置
@@ -130,17 +131,17 @@ export const useThemeConfig = defineStore('themeConfig', {
 			/**
 			 * 后端控制路由
 			 */
-			isRequestRoutes: false,
+			isRequestRoutes: true,
 
 			/**
 			 * 全局网站标题 / 副标题
 			 */
 			// 网站主标题（菜单导航、浏览器当前网页标题）
-			globalTitle: 'vue-next-admin',
+			globalTitle: 'benew-vue-admin',
 			// 网站副标题（登录页顶部文字）
-			globalViceTitle: 'vueNextAdmin',
+			globalViceTitle: 'benewVueAdmin',
 			// 网站副标题（登录页顶部文字）
-			globalViceTitleMsg: '专注、免费、开源、维护、解疑',
+			globalViceTitleMsg: '专注、免费、开源、维护、便捷',
 			// 默认初始语言，可选值"<zh-cn|en|zh-tw>"，默认 zh-cn
 			globalI18n: 'zh-cn',
 			// 默认全局组件大小，可选值"<large|'default'|small>"，默认 'large'

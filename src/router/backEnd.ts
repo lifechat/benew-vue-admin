@@ -1,20 +1,21 @@
 import { RouteRecordRaw } from 'vue-router';
-import { storeToRefs } from 'pinia';
+// import { storeToRefs } from 'pinia';
 import pinia from '/@/stores/index';
-import { useUserInfo } from '/@/stores/userInfo';
+// import { useUserInfo } from '/@/stores/userInfo';
 import { useRequestOldRoutes } from '/@/stores/requestOldRoutes';
-import { Session } from '/@/utils/storage';
 import { NextLoading } from '/@/utils/loading';
 import { dynamicRoutes, notFoundAndNoPower } from '/@/router/route';
 import { formatTwoStageRoutes, formatFlatteningRoutes, router } from '/@/router/index';
 import { useRoutesList } from '/@/stores/routesList';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
-import { useMenuApi } from '/@/api/menu/index';
+import { handleGetUserMenu } from '/@/api/menu/index';
+import { getToken } from '../utils/authFunction';
+import { useUserInfo } from '../stores/userInfo';
 
 // 后端控制路由
 
 // 引入 api 请求接口
-const menuApi = useMenuApi();
+// const menuApi = handleGetUserMenu();
 
 /**
  * 获取目录下的 .vue、.tsx 全部文件
@@ -37,10 +38,10 @@ export async function initBackEndControlRoutes() {
 	// 界面 loading 动画开始执行
 	if (window.nextLoading === undefined) NextLoading.start();
 	// 无 token 停止执行下一步
-	if (!Session.get('token')) return false;
+	if (!getToken()) return false;
 	// 触发初始化用户信息 pinia
 	// https://gitee.com/lifechat/benew-vue-admin/issues/I5F1HP
-	await useUserInfo().setUserInfos();
+	await useUserInfo(pinia).getAdminUserInfo();
 	// 获取路由菜单数据
 	const res = await getBackEndControlRoutes();
 	// 无登录权限时，添加判断
@@ -108,13 +109,14 @@ export async function setAddRoute() {
  */
 export function getBackEndControlRoutes() {
 	// 模拟 admin 与 test
-	const stores = useUserInfo(pinia);
-	const { userInfos } = storeToRefs(stores);
-	const auth = userInfos.value.roles[0];
-	// 管理员 admin
-	if (auth === 'admin') return menuApi.getAdminMenu();
-	// 其它用户 test
-	else return menuApi.getTestMenu();
+	// const stores = useUserInfo(pinia);
+	// const { userInfos } = storeToRefs(stores);
+	// const auth = userInfos.value.roles[0];
+	return handleGetUserMenu();
+	// // 管理员 admin
+	// if (auth === 'admin')
+	// // 其它用户 test
+	// else return menuApi.getTestMenu();
 }
 
 /**

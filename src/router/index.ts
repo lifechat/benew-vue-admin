@@ -10,6 +10,7 @@ import { Session } from '/@/utils/storage';
 import { staticRoutes, notFoundAndNoPower } from '/@/router/route';
 import { initFrontEndControlRoutes } from '/@/router/frontEnd';
 import { initBackEndControlRoutes } from '/@/router/backEnd';
+import { getToken } from '../utils/authFunction';
 
 /**
  * 1、前端控制路由时：isRequestRoutes 为 false，需要写 roles，需要走 setFilterRoute 方法。
@@ -90,14 +91,16 @@ export function formatTwoStageRoutes(arr: any) {
 	return newArr;
 }
 
+// 白名单路由
+const whiteList = ['/login'];
 /***
  * @author lifechat
  * 前置路由守卫
- **/ 
+ **/
 router.beforeEach(async (to, from, next) => {
 	NProgress.configure({ showSpinner: false });
 	if (to.meta.title) NProgress.start();
-	const token = Session.get('token');
+	const token = getToken();
 	if (to.path === '/login' && !token) {
 		next();
 		NProgress.done();
@@ -125,7 +128,13 @@ router.beforeEach(async (to, from, next) => {
 					next({ path: to.path, query: to.query });
 				}
 			} else {
+				// 未登录可以访问白名单页面(登录页面)
+				// if (whiteList.indexOf(to.path) !== -1) {
 				next();
+				// } else {
+				// next(`/login?redirect=${to.path}`);
+				// NProgress.done();
+				// }
 			}
 		}
 	}

@@ -1,13 +1,13 @@
 <template>
-	<el-form size="large" class="login-content-form">
-		<el-form-item class="login-animation1">
-			<el-input text :placeholder="$t('message.account.accountPlaceholder1')" v-model="state.ruleForm.userName" clearable autocomplete="off">
+	<el-form size="large" :model="state.ruleForm" :rules="rules" status-icon ref="ruleFormRef" class="login-content-form">
+		<el-form-item class="login-animation1" prop="userName">
+			<el-input text :placeholder="$t('message.account.accountPlaceholder1')" v-model.trim="state.ruleForm.userName" clearable autocomplete="off">
 				<template #prefix>
 					<el-icon class="el-input__icon"><ele-User /></el-icon>
 				</template>
 			</el-input>
 		</el-form-item>
-		<el-form-item class="login-animation2">
+		<el-form-item class="login-animation2" prop="password">
 			<el-input
 				:type="state.isShowPassword ? 'text' : 'password'"
 				:placeholder="$t('message.account.accountPlaceholder2')"
@@ -27,28 +27,8 @@
 				</template>
 			</el-input>
 		</el-form-item>
-		<el-form-item class="login-animation3">
-			<el-col :span="15">
-				<el-input
-					text
-					maxlength="4"
-					:placeholder="$t('message.account.accountPlaceholder3')"
-					v-model="state.ruleForm.code"
-					clearable
-					autocomplete="off"
-				>
-					<template #prefix>
-						<el-icon class="el-input__icon"><ele-Position /></el-icon>
-					</template>
-				</el-input>
-			</el-col>
-			<el-col :span="1"></el-col>
-			<el-col :span="8">
-				<el-button class="login-content-code" v-waves>1234</el-button>
-			</el-col>
-		</el-form-item>
 		<el-form-item class="login-animation4">
-			<el-button type="primary" class="login-content-submit" round v-waves @click="onSignIn" :loading="state.loading.signIn">
+			<el-button type="primary" class="login-content-submit" round v-waves @click="onSignIn(ruleFormRef)" :loading="state.loading.signIn">
 				<span>{{ $t('message.account.accountBtnText') }}</span>
 			</el-button>
 		</el-form-item>
@@ -56,7 +36,8 @@
 </template>
 
 <script setup lang="ts" name="loginAccount">
-import { reactive, computed } from 'vue';
+import type { FormInstance, FormRules } from 'element-plus';
+import { reactive, computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useI18n } from 'vue-i18n';
@@ -68,6 +49,7 @@ import { initBackEndControlRoutes } from '/@/router/backEnd';
 import { Session } from '/@/utils/storage';
 import { formatAxis } from '/@/utils/formatTime';
 import { NextLoading } from '/@/utils/loading';
+import { useUserInfo } from '/@/stores/userInfo';
 
 // 定义变量内容
 const { t } = useI18n();
@@ -78,37 +60,80 @@ const router = useRouter();
 const state = reactive({
 	isShowPassword: false,
 	ruleForm: {
-		userName: 'admin',
-		password: '123456',
-		code: '1234',
+		userName: '',
+		password: '',
 	},
 	loading: {
 		signIn: false,
 	},
 });
-
+const storesUser = useUserInfo();
+const ruleFormRef = ref<FormInstance>();
+const rules = reactive<FormRules>({
+	userName: [
+		{
+			required: true,
+			message: '请输入您的用户名',
+			min: 4,
+			max: 18,
+			trigger: 'blur',
+		},
+	],
+	password: [
+		{
+			required: true,
+			message: '密码为6~18位字母、数字和符号',
+			min: 6,
+			max: 18,
+			trigger: 'blur',
+		},
+	],
+});
 // 时间获取
 const currentTime = computed(() => {
 	return formatAxis(new Date());
 });
 // 登录
-const onSignIn = async () => {
-	state.loading.signIn = true;
-	// 存储 token 到浏览器缓存
-	Session.set('token', Math.random().toString(36).substr(0));
-	// 模拟数据，对接接口时，记得删除多余代码及对应依赖的引入。用于 `/src/stores/userInfo.ts` 中不同用户登录判断（模拟数据）
-	Cookies.set('userName', state.ruleForm.userName);
-	if (!themeConfig.value.isRequestRoutes) {
-		// 前端控制路由，2、请注意执行顺序
-		const isNoPower = await initFrontEndControlRoutes();
-		signInSuccess(isNoPower);
-	} else {
-		// 模拟后端控制路由，isRequestRoutes 为 true，则开启后端控制路由
-		// 添加完动态路由，再进行 router 跳转，否则可能报错 No match found for location with path "/"
-		const isNoPower = await initBackEndControlRoutes();
-		// 执行完 initBackEndControlRoutes，再执行 signInSuccess
-		signInSuccess(isNoPower);
-	}
+const onSignIn = async (formEl: FormInstance | undefined) => {
+	if (!formEl) return;
+	formEl.validate(async (valid) => {
+		if (valid) {
+			state.loading.signIn = true;
+			const params = {
+				username: state.ruleForm.userName,
+				password: state.ruleForm.password,
+			};
+			storesUser
+				.login(params)
+				.then(async () => {
+					Cookies.set('userName', state.ruleForm.userName);
+					if (!themeConfig.value.isRequestRoutes) {
+						// 前端控制路由，2、请注意执行顺序
+						const isNoPower = await initFrontEndControlRoutes();
+						signInSuccess(isNoPower);
+						// console.log('前端校验路由');
+					} else {
+						// console.log('后端校验路由');
+
+						// 模拟后端控制路由，isRequestRoutes 为 true，则开启后端控制路由
+						// 添加完动态路由，再进行 router 跳转，否则可能报错 No match found for location with path "/"
+						const isNoPower = await initBackEndControlRoutes();
+						// console.log(isNoPower);
+						// 执行完 initBackEndControlRoutes，再执行 signInSuccess
+						signInSuccess(isNoPower);
+					}
+				})
+				.catch((error: any) => {
+					const { data } = error.response;
+					const { message } = data;
+					ElMessage({
+						message: message,
+						type: 'error',
+					});
+					state.loading.signIn = false;
+				});
+		}
+	});
 };
 // 登录成功后的跳转
 const signInSuccess = (isNoPower: boolean | undefined) => {

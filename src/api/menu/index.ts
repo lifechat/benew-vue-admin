@@ -1,4 +1,4 @@
-import request from '/@/utils/request';
+import { request } from '/@/utils/http';
 
 /**
  * 以下为模拟接口地址，gitee 的不通，就换自己的真实接口地址
@@ -10,21 +10,62 @@ import request from '/@/utils/request';
  * @method getAdminMenu 获取后端动态路由菜单(admin)
  * @method getTestMenu 获取后端动态路由菜单(test)
  */
-export function useMenuApi() {
-	return {
-		getAdminMenu: (params?: object) => {
-			return request({
-				url: '/gitee/lyt-top/vue-next-admin-images/raw/master/menu/adminMenu.json',
-				method: 'get',
-				params,
-			});
-		},
-		getTestMenu: (params?: object) => {
-			return request({
-				url: '/gitee/lyt-top/vue-next-admin-images/raw/master/menu/testMenu.json',
-				method: 'get',
-				params,
-			});
-		},
-	};
-}
+
+/**
+ * 获取登录用户菜单
+ * @returns 登录用户菜单
+ */
+export const handleGetUserMenu = () => {
+	return request.get({
+		url: '/admin/user/getUserMenu',
+	});
+};
+/**
+ * 获取菜单树
+ * @returns 菜单树
+ */
+export const getMenuTree = () => {
+	return request.get({
+		url: '/admin/menu/getMenuTree',
+	});
+};
+/**
+ * 查看菜单列表
+ * @param params 查询条件
+ * @returns 菜单列表
+ */
+export const getMenuList = (params?: any) => {
+	return request.get({
+		url: '/admin/menu/list',
+		params,
+	});
+};
+/**
+ * 添加菜单
+ * @param data 菜单
+ */
+export const addMenu = (data: any) => {
+	return request.post({
+		url: '/admin/menu/add',
+		data,
+	});
+};
+/**
+ * 编辑菜单
+ * @param menuId 菜单id
+ * @returns 菜单
+ */
+export const editMenu = (menuId: number) => {
+	return request.get({
+		url: `/admin/menu/edit/${menuId}`,
+	});
+};
+/**
+ * 删除菜单
+ * @param menuId 菜单id
+ */
+export const deleteMenu = (menuId: number) => {
+	return request.delete({
+		url: `/admin/menu/delete/${menuId}`,
+	});
+};
