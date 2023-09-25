@@ -1,17 +1,17 @@
 <template>
 	<div class="system-menu-dialog-container">
-		<el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="769px">
+		<el-dialog :title="DialogData.dialog.title" v-model="DialogData.dialog.isShowDialog" :rules="rules" width="769px">
 			<el-form ref="menuDialogFormRef" :model="state.ruleForm" size="default" label-width="80px">
 				<el-row :gutter="35">
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
 						<el-form-item label="上级菜单">
 							<el-cascader
-								:options="state.menuData"
-								:props="{ checkStrictly: true, value: 'path', label: 'title' }"
+								:options="DialogData.menuOptions"
+								:props="{ label: 'title' }"
 								placeholder="请选择上级菜单"
 								clearable
 								class="w100"
-								v-model="state.ruleForm.menuSuperior"
+								v-model="DialogData.menuOptions"
 							>
 								<template #default="{ node, data }">
 									<span>{{ data.title }}</span>
@@ -23,8 +23,9 @@
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
 						<el-form-item label="菜单类型">
 							<el-radio-group v-model="state.ruleForm.menuType">
-								<el-radio label="menu">菜单</el-radio>
-								<el-radio label="btn">按钮</el-radio>
+								<el-radio label="M">目录</el-radio>
+								<el-radio label="C">菜单</el-radio>
+								<el-radio label="B">按钮</el-radio>
 							</el-radio-group>
 						</el-form-item>
 					</el-col>
@@ -33,7 +34,7 @@
 							<el-input v-model="state.ruleForm.meta.title" placeholder="格式：message.router.xxx" clearable></el-input>
 						</el-form-item>
 					</el-col>
-					<template v-if="state.ruleForm.menuType === 'menu'">
+					<template v-if="state.ruleForm.menuType === 'C'">
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 							<el-form-item label="路由名称">
 								<el-input v-model="state.ruleForm.name" placeholder="路由中的 name 值" clearable></el-input>
@@ -79,7 +80,7 @@
 							</el-form-item>
 						</el-col>
 					</template>
-					<template v-if="state.ruleForm.menuType === 'btn'">
+					<template v-if="state.ruleForm.menuType === 'B'">
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 							<el-form-item label="权限标识">
 								<el-input v-model="state.ruleForm.btnPower" placeholder="请输入权限标识" clearable></el-input>
@@ -91,7 +92,7 @@
 							<el-input-number v-model="state.ruleForm.menuSort" controls-position="right" placeholder="请输入排序" class="w100" />
 						</el-form-item>
 					</el-col>
-					<template v-if="state.ruleForm.menuType === 'menu'">
+					<template v-if="state.ruleForm.menuType === 'C'">
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 							<el-form-item label="是否隐藏">
 								<el-radio-group v-model="state.ruleForm.meta.isHide">
@@ -138,7 +139,7 @@
 			<template #footer>
 				<span class="dialog-footer">
 					<el-button @click="onCancel" size="default">取 消</el-button>
-					<el-button type="primary" @click="onSubmit" size="default">{{ state.dialog.submitTxt }}</el-button>
+					<el-button type="primary" @click="onSubmit" size="default">{{ DialogData.dialog.submitTxt }}</el-button>
 				</span>
 			</template>
 		</el-dialog>
@@ -146,12 +147,12 @@
 </template>
 
 <script setup lang="ts" name="systemMenuDialog">
-import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
+import { defineAsyncComponent, reactive, onMounted, ref, defineProps } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoutesList } from '/@/stores/routesList';
 import { i18n } from '/@/i18n/index';
-// import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
-
+import { editMenu, getMenuList, getMenuTree } from '/@/api/menu';
+import { MenuForm, MenuOption } from '/@/api/menu/types';
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 
@@ -159,14 +160,30 @@ const emit = defineEmits(['refresh']);
 const IconSelector = defineAsyncComponent(() => import('/@/components/iconSelector/index.vue'));
 
 // 定义变量内容
+const rules = reactive<FormRules>({
+	menuName: [{ required: true, message: '菜单名称不能为空', trigger: 'blur' }],
+	component: [{ required: true, message: '组件不能为空', trigger: 'blur' }],
+	orderNum: [{ required: true, message: '顺序不能为空', trigger: 'blur' }],
+	path: [{ required: true, message: '路由地址不能为空', trigger: 'blur' }],
+});
 const menuDialogFormRef = ref();
 const stores = useRoutesList();
 const { routesList } = storeToRefs(stores);
+const DialogData = reactive({
+	dialog: {
+		isShowDialog: false,
+		type: '',
+		title: '',
+		submitTxt: '',
+	},
+	menuForm: {} as MenuForm,
+	menuOptions: [] as MenuOption[],
+});
 const state = reactive({
 	// 参数请参考 `/src/router/route.ts` 中的 `dynamicRoutes` 路由菜单格式
 	ruleForm: {
 		menuSuperior: [], // 上级菜单
-		menuType: 'menu', // 菜单类型
+		menuType: 'M', // 菜单类型
 		name: '', // 路由名称
 		component: '', // 组件路径
 		componentAlias: '', // 组件路径别名
@@ -187,47 +204,73 @@ const state = reactive({
 		btnPower: '', // 菜单类型为按钮时，权限标识
 	},
 	menuData: [] as RouteItems, // 上级菜单数据
-	dialog: {
-		isShowDialog: false,
-		type: '',
-		title: '',
-		submitTxt: '',
-	},
 });
 
-// 获取 pinia 中的路由
-const getMenuData = (routes: RouteItems) => {
-	const arr: RouteItems = [];
-	routes.map((val: RouteItem) => {
-		val['title'] = i18n.global.t(val.meta?.title as string);
-		arr.push({ ...val });
-		if (val.children) getMenuData(val.children);
-	});
-	return arr;
+// 获取要修改的路由
+const getMenuData = () => {
+	// getMenuList(props.id).then(({ data }) => {
+	// 	console.log(data);
+	// 	// state.menuList = data;
+	// 	// state.tableData.loading = true;
+	// });
+	// const arr: RouteItems = [];
+	// routes.map((val: RouteItem) => {
+	// 	val['title'] = i18n.global.t(val.meta?.title as string);
+	// 	arr.push({ ...val });
+	// 	if (val.children) getMenuData(val.children);
+	// });
+	// return arr;
 };
 // 打开弹窗
-const openDialog = (type: string, row?: any) => {
+const openDialog = async (row?: any, type: string) => {
 	if (type === 'edit') {
-		// 模拟数据，实际请走接口
-		row.menuType = 'menu';
-		row.menuSort = Math.floor(Math.random() * 100);
-		state.ruleForm = JSON.parse(JSON.stringify(row));
-		state.dialog.title = '修改菜单';
-		state.dialog.submitTxt = '修 改';
+		// row.menuSort = Math.floor(Math.random() * 100);
+		// state.ruleForm = JSON.parse(JSON.stringify(row));
+
+		try {
+			const menuTree: MenuOption[] = [];
+			const MenuData = await getMenuTree();
+			const { data } = MenuData;
+			const menuOption: MenuOption = { value: 0, label: '顶级菜单', children: data.data };
+			menuTree.push(menuOption);
+			DialogData.menuOptions = menuTree;
+			const res = await editMenu(row.id);
+			const { menuName } = res.data;
+			state.ruleForm.name = menuName;
+			console.log(data);
+			DialogData.dialog.title = '修改菜单';
+			DialogData.dialog.submitTxt = '修 改';
+		} catch (error) {
+			console.log(error);
+		}
+
+		// .then(({ data }) => {
+		// 	if (data.flag) {
+		// 		console.log(data);
+		// 		state.dialog.title = '修改菜单';
+		// 		state.dialog.submitTxt = '修 改';
+		// 		state.ruleForm.menuType = data.menuType;
+		// 		state.ruleForm.name = data.name;
+		// 		// menuForm.value = data.data;
+		// 		// title.value = '修改菜单';
+		// 		// addOrUpdate.value = true;
+		// 	}
+		// });
+		// getMenuData();
 	} else {
-		state.dialog.title = '新增菜单';
-		state.dialog.submitTxt = '新 增';
+		DialogData.dialog.title = '新增菜单';
+		DialogData.dialog.submitTxt = '新 增';
 		// 清空表单，此项需加表单验证才能使用
 		// nextTick(() => {
 		// 	menuDialogFormRef.value.resetFields();
 		// });
 	}
-	state.dialog.type = type;
-	state.dialog.isShowDialog = true;
+	DialogData.dialog.type = type;
+	DialogData.dialog.isShowDialog = true;
 };
 // 关闭弹窗
 const closeDialog = () => {
-	state.dialog.isShowDialog = false;
+	DialogData.dialog.isShowDialog = false;
 };
 // 是否内嵌下拉改变
 const onSelectIframeChange = () => {
@@ -242,8 +285,6 @@ const onCancel = () => {
 const onSubmit = () => {
 	closeDialog(); // 关闭弹窗
 	emit('refresh');
-	// if (state.dialog.type === 'add') { }
-	// setBackEndControlRefreshRoutes() // 刷新菜单，未进行后端接口测试
 };
 // 页面加载时
 onMounted(() => {

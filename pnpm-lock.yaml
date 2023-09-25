@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@element-plus/icons-vue': ^2.1.0
+  '@types/lodash-es': ^4.17.9
   '@types/node': ^18.15.11
   '@types/nprogress': ^0.2.0
   '@types/sortablejs': ^1.15.1
@@ -14,6 +15,7 @@ specifiers:
   axios: ^1.3.5
   countup.js: ^2.6.0
   cropperjs: ^1.5.13
+  dayjs: ^1.11.10
   echarts: ^5.4.2
   echarts-gl: ^2.0.9
   echarts-wordcloud: ^2.1.0
@@ -23,6 +25,7 @@ specifiers:
   js-cookie: ^3.0.1
   js-table2excel: ^1.0.3
   jsplumb: ^2.15.6
+  lodash-es: ^4.17.21
   mitt: ^3.0.0
   nprogress: ^0.2.0
   pinia: ^2.0.34
@@ -54,6 +57,7 @@ dependencies:
   axios: 1.5.0
   countup.js: 2.8.0
   cropperjs: 1.6.1
+  dayjs: 1.11.10
   echarts: 5.4.3
   echarts-gl: 2.0.9_echarts@5.4.3
   echarts-wordcloud: 2.1.0_echarts@5.4.3
@@ -61,6 +65,7 @@ dependencies:
   js-cookie: 3.0.5
   js-table2excel: 1.1.2
   jsplumb: 2.15.6
+  lodash-es: 4.17.21
   mitt: 3.0.1
   nprogress: 0.2.0
   pinia: 2.1.6_typescript@5.2.2+vue@3.3.4
@@ -78,6 +83,7 @@ dependencies:
   vue-router: 4.2.4_vue@3.3.4
 
 devDependencies:
+  '@types/lodash-es': 4.17.9
   '@types/node': 18.17.17
   '@types/nprogress': 0.2.0
   '@types/sortablejs': 1.15.2
@@ -699,11 +705,9 @@ packages:
     resolution: {integrity: sha512-ZTcmhiI3NNU7dEvWLZJkzG6ao49zOIjEgIE0RgV7wbPxU0f2xT3VSAHw2gmst8swH6V0YkLRGp4qPlX/6I90MQ==}
     dependencies:
       '@types/lodash': 4.14.198
-    dev: false
 
   /@types/lodash/4.14.198:
     resolution: {integrity: sha512-trNJ/vtMZYMLhfN45uLq4ShQSw0/S7xCTLLVM+WM1rmFpba/VS42jVUgaO3w/NOLiWR/09lnYk0yMaA/atdIsg==}
-    dev: false
 
   /@types/node/18.17.17:
     resolution: {integrity: sha512-cOxcXsQ2sxiwkykdJqvyFS+MLQPLvIdwh5l6gNg8qF6s+C7XSkEWOZjK+XhUZd+mYvHV/180g2cnCcIl4l06Pw==}
@@ -1402,8 +1406,8 @@ packages:
       type: 1.2.0
     dev: false
 
-  /dayjs/1.11.9:
-    resolution: {integrity: sha512-QvzAURSbQ0pKdIye2txOzNaHmxtUBXerpY0FJsFXUMKbIZeFm5ht1LS/jFsrncjnmtv8HsG0W2g6c0zUjZWmpA==}
+  /dayjs/1.11.10:
+    resolution: {integrity: sha512-vjAczensTgRcqDERK0SR2XMwsF/tSvnvlv6VcF2GIhg6Sx4yOIt/irsr1RDJsKiIyBzJDpCoXiWWq28MqH2cnQ==}
     dev: false
 
   /debug/4.3.4:
@@ -1489,7 +1493,7 @@ packages:
       '@types/lodash-es': 4.17.9
       '@vueuse/core': 9.13.0_vue@3.3.4
       async-validator: 4.2.5
-      dayjs: 1.11.9
+      dayjs: 1.11.10
       escape-html: 1.0.3
       lodash: 4.17.21
       lodash-es: 4.17.21

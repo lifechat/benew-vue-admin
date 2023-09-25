@@ -28,11 +28,10 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 			open: JSON.parse(env.VITE_OPEN),
 			hmr: true,
 			proxy: {
-				'/gitee': {
-					target: 'https://gitee.com',
-					ws: true,
+				'/api': {
+					target: 'http://yiwind.cn:80',
 					changeOrigin: true,
-					rewrite: (path) => path.replace(/^\/gitee/, ''),
+					rewrite: (path) => path.replace(/^\/api/, ''),
 				},
 			},
 		},

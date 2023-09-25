@@ -8,6 +8,7 @@ import { useUserInfo } from '/@/stores/userInfo';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
 import { useRoutesList } from '/@/stores/routesList';
 import { NextLoading } from '/@/utils/loading';
+import { getToken } from '../utils/authFunction';
 
 // 前端控制路由
 
@@ -22,10 +23,10 @@ export async function initFrontEndControlRoutes() {
 	// 界面 loading 动画开始执行
 	if (window.nextLoading === undefined) NextLoading.start();
 	// 无 token 停止执行下一步
-	if (!Session.get('token')) return false;
+	if (!getToken()) return false;
 	// 触发初始化用户信息 pinia
 	// https://gitee.com/lifechat/benew-vue-admin/issues/I5F1HP
-	await useUserInfo(pinia).setUserInfos();
+	await useUserInfo(pinia).getAdminUserInfo();
 	// 无登录权限时，添加判断
 	// https://gitee.com/lifechat/benew-vue-admin/issues/I64HVO
 	if (useUserInfo().userInfos.roles.length <= 0) return Promise.resolve(true);
