@@ -1,27 +1,27 @@
 <template>
 	<div class="system-menu-dialog-container">
-		<el-dialog :title="DialogData.dialog.title" v-model="DialogData.dialog.isShowDialog" :rules="rules" width="769px">
+		<el-dialog :title="props.title" v-model="state.ruleForm.isShowDialog" width="769px">
 			<el-form ref="menuDialogFormRef" :model="state.ruleForm" size="default" label-width="80px">
 				<el-row :gutter="35">
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
 						<el-form-item label="上级菜单">
 							<el-cascader
-								:options="DialogData.menuOptions"
-								:props="{ label: 'title' }"
+								:options="props.menuData"
+								:props="{ checkStrictly: true, value: 'id', label: 'menuName' }"
 								placeholder="请选择上级菜单"
 								clearable
 								class="w100"
-								v-model="DialogData.menuOptions"
+								v-model="state.ruleForm.menuSuperior"
 							>
 								<template #default="{ node, data }">
-									<span>{{ data.title }}</span>
+									<span>{{ data.menuName }}</span>
 									<span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
 								</template>
 							</el-cascader>
 						</el-form-item>
 					</el-col>
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
-						<el-form-item label="菜单类型">
+						<el-form-item label="菜单类型" :rules="[{ required: true, message: '菜单类型不能为空', trigger: 'blur' }]">
 							<el-radio-group v-model="state.ruleForm.menuType">
 								<el-radio label="M">目录</el-radio>
 								<el-radio label="C">菜单</el-radio>
@@ -30,19 +30,14 @@
 						</el-form-item>
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
-						<el-form-item label="菜单名称">
-							<el-input v-model="state.ruleForm.meta.title" placeholder="格式：message.router.xxx" clearable></el-input>
+						<el-form-item label="菜单名称" :rules="[{ required: true, message: '菜单名称不能为空', trigger: 'blur' }]">
+							<el-input v-model="state.ruleForm.name" placeholder="请输入菜单名称" clearable></el-input>
 						</el-form-item>
 					</el-col>
-					<template v-if="state.ruleForm.menuType === 'C'">
+					<template v-if="state.ruleForm.menuType === 'C' || state.ruleForm.menuType === 'M'">
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
-							<el-form-item label="路由名称">
-								<el-input v-model="state.ruleForm.name" placeholder="路由中的 name 值" clearable></el-input>
-							</el-form-item>
-						</el-col>
-						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
-							<el-form-item label="路由路径">
-								<el-input v-model="state.ruleForm.path" placeholder="路由中的 path 值" clearable></el-input>
+							<el-form-item label="路由路径" :rules="[{ required: true, message: '路由路径不能为空', trigger: 'blur' }]">
+								<el-input v-model="state.ruleForm.path" placeholder="请输入路由路径值" clearable></el-input>
 							</el-form-item>
 						</el-col>
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
@@ -56,19 +51,8 @@
 							</el-form-item>
 						</el-col>
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
-							<el-form-item label="组件路径">
+							<el-form-item label="组件路径" :rules="[{ required: true, message: '组件路径不能为空', trigger: 'blur' }]">
 								<el-input v-model="state.ruleForm.componentAlias" placeholder="组件路径" clearable></el-input>
-							</el-form-item>
-						</el-col>
-						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
-							<el-form-item label="链接地址">
-								<el-input
-									v-model="state.ruleForm.meta.isLink"
-									placeholder="外链/内嵌时链接地址（http:xxx.com）"
-									clearable
-									:disabled="!state.ruleForm.isLink"
-								>
-								</el-input>
 							</el-form-item>
 						</el-col>
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
@@ -92,12 +76,12 @@
 							<el-input-number v-model="state.ruleForm.menuSort" controls-position="right" placeholder="请输入排序" class="w100" />
 						</el-form-item>
 					</el-col>
-					<template v-if="state.ruleForm.menuType === 'C'">
+					<template v-if="state.ruleForm.menuType === 'C' || state.ruleForm.menuType === 'M'">
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 							<el-form-item label="是否隐藏">
 								<el-radio-group v-model="state.ruleForm.meta.isHide">
-									<el-radio :label="true">隐藏</el-radio>
-									<el-radio :label="false">不隐藏</el-radio>
+									<el-radio :label="1">隐藏</el-radio>
+									<el-radio :label="0">不隐藏</el-radio>
 								</el-radio-group>
 							</el-form-item>
 						</el-col>
@@ -118,10 +102,10 @@
 							</el-form-item>
 						</el-col>
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
-							<el-form-item label="是否外链">
-								<el-radio-group v-model="state.ruleForm.isLink" :disabled="state.ruleForm.meta.isIframe">
-									<el-radio :label="true">是</el-radio>
-									<el-radio :label="false">否</el-radio>
+							<el-form-item label="是否禁用">
+								<el-radio-group v-model="state.ruleForm.meta.isDisable">
+									<el-radio :label="1">是</el-radio>
+									<el-radio :label="0">否</el-radio>
 								</el-radio-group>
 							</el-form-item>
 						</el-col>
@@ -139,7 +123,7 @@
 			<template #footer>
 				<span class="dialog-footer">
 					<el-button @click="onCancel" size="default">取 消</el-button>
-					<el-button type="primary" @click="onSubmit" size="default">{{ DialogData.dialog.submitTxt }}</el-button>
+					<el-button type="primary" @click="onSubmit" size="default">{{ state.dialog.submitTxt }}</el-button>
 				</span>
 			</template>
 		</el-dialog>
@@ -151,8 +135,10 @@ import { defineAsyncComponent, reactive, onMounted, ref, defineProps } from 'vue
 import { storeToRefs } from 'pinia';
 import { useRoutesList } from '/@/stores/routesList';
 import { i18n } from '/@/i18n/index';
-import { editMenu, getMenuList, getMenuTree } from '/@/api/menu';
-import { MenuForm, MenuOption } from '/@/api/menu/types';
+import { addMenu } from '/@/api/menu';
+import { ElMessage } from 'element-plus';
+import { isEmpty } from '/@/utils/authFunction';
+
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 
@@ -160,28 +146,18 @@ const emit = defineEmits(['refresh']);
 const IconSelector = defineAsyncComponent(() => import('/@/components/iconSelector/index.vue'));
 
 // 定义变量内容
-const rules = reactive<FormRules>({
-	menuName: [{ required: true, message: '菜单名称不能为空', trigger: 'blur' }],
-	component: [{ required: true, message: '组件不能为空', trigger: 'blur' }],
-	orderNum: [{ required: true, message: '顺序不能为空', trigger: 'blur' }],
-	path: [{ required: true, message: '路由地址不能为空', trigger: 'blur' }],
+const props = defineProps({
+	title: String,
+	submitTxt: String,
+	menuData: [] as any,
 });
 const menuDialogFormRef = ref();
 const stores = useRoutesList();
 const { routesList } = storeToRefs(stores);
-const DialogData = reactive({
-	dialog: {
-		isShowDialog: false,
-		type: '',
-		title: '',
-		submitTxt: '',
-	},
-	menuForm: {} as MenuForm,
-	menuOptions: [] as MenuOption[],
-});
 const state = reactive({
 	// 参数请参考 `/src/router/route.ts` 中的 `dynamicRoutes` 路由菜单格式
 	ruleForm: {
+		isShowDialog: false,
 		menuSuperior: [], // 上级菜单
 		menuType: 'M', // 菜单类型
 		name: '', // 路由名称
@@ -194,9 +170,10 @@ const state = reactive({
 		meta: {
 			title: '', // 菜单名称
 			icon: '', // 菜单图标
-			isHide: false, // 是否隐藏
+			isHide: 0, // 是否隐藏
 			isKeepAlive: true, // 是否缓存
 			isAffix: false, // 是否固定
+			isDisable: 0, // 是否禁用
 			isLink: '', // 外链/内嵌时链接地址（http:xxx.com），开启外链条件，`1、isLink: 链接地址不为空`
 			isIframe: false, // 是否内嵌，开启条件，`1、isIframe:true 2、isLink：链接地址不为空`
 			roles: '', // 权限标识，取角色管理
@@ -204,85 +181,95 @@ const state = reactive({
 		btnPower: '', // 菜单类型为按钮时，权限标识
 	},
 	menuData: [] as RouteItems, // 上级菜单数据
+	dialog: {
+		type: '',
+		title: '',
+		isShowDialog: false,
+		submitTxt: '',
+	},
 });
 
-// 获取要修改的路由
-const getMenuData = () => {
-	// getMenuList(props.id).then(({ data }) => {
-	// 	console.log(data);
-	// 	// state.menuList = data;
-	// 	// state.tableData.loading = true;
-	// });
-	// const arr: RouteItems = [];
-	// routes.map((val: RouteItem) => {
-	// 	val['title'] = i18n.global.t(val.meta?.title as string);
-	// 	arr.push({ ...val });
-	// 	if (val.children) getMenuData(val.children);
-	// });
-	// return arr;
+// 获取 pinia 中的路由
+const getMenuData = (routes: RouteItems) => {
+	const arr: RouteItems = [];
+	routes.map((val: RouteItem) => {
+		val['title'] = i18n.global.t(val.meta?.title as string);
+		arr.push({ ...val });
+		if (val.children) getMenuData(val.children);
+	});
+	return arr;
 };
 // 打开弹窗
-const openDialog = async (row?: any, type: string) => {
+const openDialog = (type: string, row?: any) => {
 	if (type === 'edit') {
-		// row.menuSort = Math.floor(Math.random() * 100);
-		// state.ruleForm = JSON.parse(JSON.stringify(row));
-
-		try {
-			const menuTree: MenuOption[] = [];
-			const MenuData = await getMenuTree();
-			const { data } = MenuData;
-			const menuOption: MenuOption = { value: 0, label: '顶级菜单', children: data.data };
-			menuTree.push(menuOption);
-			DialogData.menuOptions = menuTree;
-			const res = await editMenu(row.id);
-			const { menuName } = res.data;
-			state.ruleForm.name = menuName;
-			console.log(data);
-			DialogData.dialog.title = '修改菜单';
-			DialogData.dialog.submitTxt = '修 改';
-		} catch (error) {
-			console.log(error);
-		}
-
-		// .then(({ data }) => {
-		// 	if (data.flag) {
-		// 		console.log(data);
-		// 		state.dialog.title = '修改菜单';
-		// 		state.dialog.submitTxt = '修 改';
-		// 		state.ruleForm.menuType = data.menuType;
-		// 		state.ruleForm.name = data.name;
-		// 		// menuForm.value = data.data;
-		// 		// title.value = '修改菜单';
-		// 		// addOrUpdate.value = true;
-		// 	}
-		// });
-		// getMenuData();
+		// 模拟数据，实际请走接口
+		row.menuType = 'menu';
+		row.menuSort = Math.floor(Math.random() * 100);
+		state.ruleForm = JSON.parse(JSON.stringify(row));
+		console.log(state.ruleForm);
+		state.dialog.title = '修改菜单';
+		state.dialog.submitTxt = '修 改';
 	} else {
-		DialogData.dialog.title = '新增菜单';
-		DialogData.dialog.submitTxt = '新 增';
+		state.dialog.title = '新增菜单';
+		state.dialog.submitTxt = '新 增';
 		// 清空表单，此项需加表单验证才能使用
 		// nextTick(() => {
 		// 	menuDialogFormRef.value.resetFields();
 		// });
 	}
-	DialogData.dialog.type = type;
-	DialogData.dialog.isShowDialog = true;
+	state.ruleForm.isShowDialog = true;
 };
-// 关闭弹窗
-const closeDialog = () => {
-	DialogData.dialog.isShowDialog = false;
-};
+
 // 是否内嵌下拉改变
 const onSelectIframeChange = () => {
 	if (state.ruleForm.meta.isIframe) state.ruleForm.isLink = true;
 	else state.ruleForm.isLink = false;
 };
+
+// 关闭弹窗
+const closeDialog = () => {
+	state.ruleForm.isShowDialog = false;
+};
 // 取消
 const onCancel = () => {
 	closeDialog();
 };
+
+// 新增菜单
+const handleAddMenu = async () => {
+	console.log(state.ruleForm);
+	const { menuType, meta, name, menuSort, path, componentAlias, menuSuperior, btnPower } = state.ruleForm;
+	const params = {
+		menuType: menuType,
+		icon: meta.icon,
+		path: path,
+		menuName: name,
+		orderNum: menuSort,
+		component: componentAlias,
+		isHidden: meta.isHide,
+		isDisable: meta.isDisable,
+		perms: btnPower,
+		parentId: menuSuperior[0],
+		create_time: new Date(),
+	};
+	try {
+		const res = await addMenu(params);
+		console.log(res);
+	} catch (error: any) {
+		ElMessage.error(error);
+	}
+};
 // 提交
 const onSubmit = () => {
+	const { name, path, componentAlias, component } = state.ruleForm;
+	if (isEmpty(name) && isEmpty(path) && isEmpty(componentAlias) && isEmpty(component)) {
+		ElMessage({
+			type: 'error',
+			message: '请填写对应内容',
+		});
+		return;
+	}
+	handleAddMenu();
 	closeDialog(); // 关闭弹窗
 	emit('refresh');
 };

@@ -51,6 +51,16 @@ export const addMenu = (data: any) => {
 	});
 };
 /**
+ * 获取菜单下拉树
+ * @returns 菜单下拉树
+ */
+export const getMenuOptions = () => {
+	return request.get({
+		url: '/admin/menu/getMenuOptions',
+	});
+};
+
+/**
  * 编辑菜单
  * @param menuId 菜单id
  * @returns 菜单

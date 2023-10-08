@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig, Canceler } from 'axios';
 import axios from 'axios';
-import { isFunction } from '/@/utils/authFunction';
+import { isFunction } from '/@/utils/typeChecks';
 
 let pendingMap = new Map<string, Canceler>();
 export const getPendingUrl = (config: AxiosRequestConfig) => [config.method, config.url].join('&');

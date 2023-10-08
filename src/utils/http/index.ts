@@ -5,7 +5,7 @@ import { ResultEnum, ContentTypeEnum, ErrorShowType } from './types';
 import { checkStatus } from './checkStatus';
 // import config from '/@/config';
 import { VAxios } from './Axios';
-import { deepMerge } from '/@/utils/authFunction';
+import { deepMerge } from '/@/utils/typeChecks';
 import { getToken, token_prefix } from '/@/utils/authFunction';
 import { ElMessage } from 'element-plus';
 

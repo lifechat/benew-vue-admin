@@ -97,26 +97,16 @@
 				<!-- 操作 -->
 				<el-table-column label="操作" align="center" width="210">
 					<template #default="scope">
-						<el-button
-							v-if="scope.row.menuType === 'M' || scope.row.menuType === 'C'"
-							size="small"
-							text
-							type="primary"
-							@click="onOpenAddMenu(scope.row, 'add')"
+						<el-button v-if="scope.row.menuType === 'M' || scope.row.menuType === 'C'" size="small" text type="primary" @click="onOpenAddMenu()"
 							>新增</el-button
 						>
-						<el-button size="small" text type="primary" @click="onOpenEditMenu(scope.row, 'edit')">修改</el-button>
+						<el-button size="small" text type="primary" @click="onOpenEditMenu(scope.row)">修改</el-button>
 						<el-button size="small" text type="primary" @click="onTabelRowDel(scope.row)">删除</el-button>
-						<!-- <el-button v-if="scope.row.menuType === 'M' || scope.row.menuType === 'C'" type="success" link icon="Plus" @click="handleAdd(scope.row)"
-							>新增</el-button
-						> -->
-						<!-- <el-button type="primary" link icon="Edit" @click="handleEdit(scope.row.id)">编辑</el-button>
-						<el-button type="danger" link icon="Delete" @click="handleDelete(scope.row.id)">删除</el-button> -->
 					</template>
 				</el-table-column>
 			</el-table>
 		</el-card>
-		<MenuDialog ref="menuDialogRef" @refresh="getTableData()" />
+		<MenuDialog ref="menuDialogRef" :title="state.title" :submit-txt="state.submitTxt" :menu-data="state.menuList" @refresh="getTableData()" />
 	</div>
 </template>
 
@@ -124,10 +114,10 @@
 import { defineAsyncComponent, ref, onMounted, reactive, toRefs } from 'vue';
 import { RouteRecordRaw } from 'vue-router';
 import { ElMessageBox, ElMessage } from 'element-plus';
-import { getMenuList, deleteMenu } from '/@/api/menu';
+import { getMenuList, deleteMenu, getMenuOptions } from '/@/api/menu';
 import { MenuOption, MenuQuery, MenuForm, Menu } from '/@/api/menu/types';
 import { formatDateTime } from '/@/utils/formatTime';
-import { mutable } from 'element-plus/es/utils';
+import { isString } from '/@/utils/authFunction';
 // import { setBackEndControlRefreshRoutes } from "/@/router/backEnd";
 
 // 引入组件
@@ -143,6 +133,7 @@ const state = reactive({
 	title: '',
 	addOrUpdate: false,
 	queryParams: {} as MenuQuery,
+	submitTxt: '',
 	isDisable: [
 		{
 			value: 0,
@@ -175,21 +166,7 @@ const state = reactive({
 	},
 });
 
-const {
-	showSearch,
-	loading,
-	title,
-	addOrUpdate,
-	queryParams,
-	isDisable,
-	isHidden,
-	showChooseIcon,
-	refreshTable,
-	isExpandAll,
-	menuOptions,
-	menuForm,
-	menuList,
-} = toRefs(state);
+const { loading, isDisable, refreshTable, isExpandAll, menuList, menuOptions } = toRefs(state);
 
 const getQueryData = () => {
 	// 解决查询字段为空的bug 不出结果
@@ -200,7 +177,7 @@ const getQueryData = () => {
 	if (!menutype) {
 		state.queryParams.menutype = null;
 	}
-	if (!isDisable) {
+	if (isString(isDisable) && !isDisable) {
 		state.queryParams.isDisable = null;
 	}
 	if (!keyword || !menutype || !isDisable) {
@@ -219,14 +196,29 @@ const getTableData = () => {
 		}, 500);
 	});
 };
+
 // 打开新增菜单弹窗
-const onOpenAddMenu = (row: any, type: string) => {
-	menuDialogRef.value.openDialog(row, type);
+const onOpenAddMenu = async () => {
+	state.title = '添加菜单';
+	state.submitTxt = '添加菜单';
+	menuDialogRef.value.openDialog({
+		menuOptions: menuOptions,
+		menutype: 'M',
+		isHide: false,
+		isKeepAlive: true,
+		isAffix: false,
+		isIframe: false,
+		status: 1,
+		orderNo: 100,
+	});
 };
 // 打开编辑菜单弹窗
-const onOpenEditMenu = (row: any, type: string) => {
-	menuDialogRef.value.openDialog(row, type);
+const onOpenEditMenu = (row: any) => {
+	state.title = '编辑菜单';
+	state.submitTxt = '确认修改';
+	menuDialogRef.value.openDialog(row);
 };
+
 // 重置操作
 const handleReset = () => {
 	getTableData();
@@ -248,7 +240,7 @@ const onTabelRowDel = (row: any) => {
 			ElMessage.error(error);
 		});
 };
-
+// 删除路由菜单
 const handleDelMenu = async (id: number) => {
 	try {
 		await deleteMenu(id);

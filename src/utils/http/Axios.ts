@@ -4,7 +4,7 @@ import type { CreateAxiosOptions } from './axiosTransform';
 import axios from 'axios';
 import qs from 'qs';
 import { AxiosCanceler } from './AxiosCanceler';
-import { isFunction } from '/@/utils/authFunction';
+import { isFunction } from '/@/utils/typeChecks';
 import { cloneDeep } from 'lodash-es';
 import { ContentTypeEnum, RequestEnum } from './types';
 export * from './axiosTransform';
